@@ -6,6 +6,7 @@ export interface Callbacks<Values = any> {
   onValuesChange?: (changedValues: any, values: Values) => void;
   onFieldsChange?: (changedFields: NamePath[], allFields: NamePath[]) => void;
   onFinish?: (values: Values) => void;
+  onFinishFailed?: (err: Values) => void;
 }
 
 export interface FormInstance<Values = any> {
@@ -14,4 +15,15 @@ export interface FormInstance<Values = any> {
   getFieldsValue: () => Values;
   setFieldsValue: (newStore: Store) => void;
   setCallbacks: (callbacks: Callbacks) => void;
+  registerFieldEntities: (entity: FieldEntity) => void;
+}
+
+export type Rule = { required: boolean; message: string };
+
+export interface FieldEntity {
+  props: {
+    name?: NamePath;
+    rules?: Rule[];
+  };
+  onStoreChange: () => void;
 }

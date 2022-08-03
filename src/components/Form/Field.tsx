@@ -1,17 +1,34 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useLayoutEffect } from "react";
 import FieldContext from "./FieldContext";
-import type { NamePath } from "./interface";
+import type { NamePath, Rule } from "./interface";
 
-const Field: React.FC<{ name: NamePath }> = (props) => {
-  const { getFieldValue, setFieldsValue } = React.useContext(FieldContext);
+type FiledProps = {
+  name: NamePath;
+  rules: Rule[];
+};
 
+const Field: React.FC<FiledProps> = (props) => {
   const { children, name } = props;
+  const { getFieldValue, setFieldsValue, registerFieldEntities } =
+    React.useContext(FieldContext);
+  const [, forceUpdate] = React.useReducer((x) => x + 1, 0);
+
+  useLayoutEffect(() => {
+    const unregister =
+      registerFieldEntities &&
+      registerFieldEntities({
+        props,
+        onStoreChange: forceUpdate,
+      });
+    return unregister;
+  }, []);
+
   const getControlled = () => {
     return {
-      value: getFieldValue && getFieldValue(name),
+      value: (getFieldValue && getFieldValue(name)) || "",
       onChange: (e: ChangeEvent<HTMLInputElement>) => {
         const newValue = e?.target?.value;
-        setFieldsValue?.({ [name]: newValue });
+        setFieldsValue && setFieldsValue({ [name]: newValue });
       },
     };
   };

@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useImperativeHandle } from "react";
 import FieldContext from "./FieldContext";
 import useForm from "./useForm";
-import type { Callbacks } from "./interface";
+import type { Callbacks, FormInstance } from "./interface";
 
-const Form: React.FC<Callbacks> = (props) => {
-  const { children, onFinish } = props;
+interface FormProps<Values = any> {
+  form?: FormInstance<Values>;
+  onFinish?: Callbacks<Values>["onFinish"];
+  onFinishFailed?: Callbacks<Values>["onFinishFailed"];
+}
 
-  const [formInstance] = useForm();
-  formInstance.setCallbacks({ onFinish });
+const Form: React.FC<FormProps> = (props) => {
+  const { children, onFinish, onFinishFailed, form } = props;
+
+  const [formInstance] = useForm(form);
+  formInstance.setCallbacks({ onFinish, onFinishFailed });
 
   return (
     <form
